@@ -8,9 +8,6 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	
-	// スプライトの削除
-	delete sprite_;
-
 	// モデルの削除
 	delete model_;
 
@@ -23,23 +20,22 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
-	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("mario.jpg");
-
-	// サウンドデータの読み込み
-	soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
-
-	// スプライトの生成
-	sprite_ = Sprite::Create(textureHandle_, {100, 50});
-
-	// 音声再生
-	audio_->PlayWave(soundDataHandle_);
-
-	// 音声再生
-	voiceHandle_ = audio_->PlayWave(soundDataHandle_, true);
 
 	// 3Dモデルの作成
 	model_ = Model::Create();
+
+	// X、Y、Z軸周りの平行移動を設定
+	worldTransform_.translation_ = {10.0f, 10.0f, 10.0f};
+
+	// X、Y、Z方向のスケーリングを設定
+	worldTransform_.scale_ = {5.0f, 5.0f, 5.0f};
+
+	// X、Y、Z軸周りの回転角を設定
+	worldTransform_.rotation_ = {XM_PI / 4.0f, XM_PI / 4.0f, 0.0f};
+
+	// 度数法の角度で設定
+	//worldTransform_.rotation_ = {XMConvertToRadians(45.0f), XMConvertToRadians(45.0f), 0.0f};
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -49,32 +45,30 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	
-	// スプライトの今の座標を取得
-	XMFLOAT2 position = sprite_->GetPosition();
 
-	// 座標を{ 2, 0 }移動
-	position.x += 2.0f;
-	position.y += 1.0f;
+	// X、Y、Z軸周りの平行移動の数値をデバック表示
+	std::string strDebug = std::string("translation(") +
+		std::to_string(worldTransform_.translation_.x) + std::string(",") +
+		std::to_string(worldTransform_.translation_.y) + std::string(",") +
+		std::to_string(worldTransform_.translation_.z) + std::string(")");
 
-	// 移動した座標をスプライトに反映
-	sprite_->SetPosition(position);
-
-	// スペースキーを押した瞬間
-	if (input_->TriggerKey(DIK_SPACE)) {
-		// 音声停止
-		audio_->StopWave(voiceHandle_);
-	}
-
-	// 変数の値をインクリメント
-	value_++;
-
-	// 値を含んだ文字列
-	std::string strDebug = std::string("Value:") +
-	std::to_string(value_);
-
-	// デバックテキストの表示
 	debugText_->Print(strDebug, 50, 50, 1.0f);
+
+	// X、Y、Z軸周りの回転角をデバック表示
+	strDebug = std::string("rotation:(") +
+		std::to_string(worldTransform_.rotation_.x) + std::string(",") +
+		std::to_string(worldTransform_.rotation_.y) + std::string(",") +
+		std::to_string(worldTransform_.rotation_.z) + std::string(")");
+
+	debugText_->Print(strDebug, 50, 70, 1.0f);
+
+	// X、Y、Z軸周りの回転角をデバック表示
+	strDebug = std::string("scale:(") +
+		std::to_string(worldTransform_.scale_.x) + std::string(",") +
+		std::to_string(worldTransform_.scale_.y) + std::string(",") +
+		std::to_string(worldTransform_.scale_.z) + std::string(")");
+
+	debugText_->Print(strDebug, 50, 90, 1.0f);
 }
 
 void GameScene::Draw() {
@@ -84,15 +78,15 @@ void GameScene::Draw() {
 
 #pragma region 背景スプライト描画
 	// 背景スプライト描画前処理
-	Sprite::PreDraw(commandList);
+	//Sprite::PreDraw(commandList);
 
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	sprite_->Draw();
+	//sprite_->Draw();
 
 	// スプライト描画後処理
-	Sprite::PostDraw();
+	//Sprite::PostDraw();
 	// 深度バッファクリア
 	dxCommon_->ClearDepthBuffer();
 #pragma endregion
