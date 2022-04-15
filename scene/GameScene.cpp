@@ -55,35 +55,44 @@ void GameScene::Initialize() {
 		worldTransform_[i].Initialize();
 	}
 
+	// カメラ視点座標を設定
+	viewProjection_.eye = {0, 0, -10};
+
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 }
 
 void GameScene::Update() {
 
-	// X、Y、Z軸周りの平行移動の数値をデバック表示
-	std::string strDebug = std::string("translation(") +
-		std::to_string(worldTransform_[0].translation_.x) + std::string(",") +
-		std::to_string(worldTransform_[0].translation_.y) + std::string(",") +
-		std::to_string(worldTransform_[0].translation_.z) + std::string(")");
+	//////////////////
+	//	-視点移動処理-	//
+	//////////////////
 
-	debugText_->Print(strDebug, 50, 50, 1.0f);
+	// 視点の移動ベクトル
+	XMFLOAT3 move = {0, 0, 0};
 
-	// X、Y、Z軸周りの回転角をデバック表示
-	strDebug = std::string("rotation:(") +
-		std::to_string(worldTransform_[0].rotation_.x) + std::string(",") +
-		std::to_string(worldTransform_[0].rotation_.y) + std::string(",") +
-		std::to_string(worldTransform_[0].rotation_.z) + std::string(")");
+	// 視点の移動速さ
+	const float kEyeSpeed = 0.2f;
 
-	debugText_->Print(strDebug, 50, 70, 1.0f);
+	// 推した方向で移動ベクトルを変更
+	if (input_->PushKey(DIK_W)) {
+		move = {0, 0, kEyeSpeed};
+	} else if (input_->PushKey(DIK_S)) {
+	
+	move = {0, 0, -kEyeSpeed};
+	}
 
-	// X、Y、Z軸周りの回転角をデバック表示
-	strDebug = std::string("scale:(") +
-		std::to_string(worldTransform_[0].scale_.x) + std::string(",") +
-		std::to_string(worldTransform_[0].scale_.y) + std::string(",") +
-		std::to_string(worldTransform_[0].scale_.z) + std::string(")");
+	// 視点移動（ベクトルの加算）
+	viewProjection_.eye.x += move.x;
+	viewProjection_.eye.y += move.y;
+	viewProjection_.eye.z += move.z;
 
-	debugText_->Print(strDebug, 50, 90, 1.0f);
+	// 行列の再計算
+	viewProjection_.UpdateMatrix();
+
+	// デバック用表示
+	debugText_->SetPos(50, 50);
+	debugText_->Printf("eye:(%f, %f, %f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
 }
 
 void GameScene::Draw() {
