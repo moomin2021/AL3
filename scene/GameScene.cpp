@@ -38,25 +38,47 @@ void GameScene::Initialize() {
 	std::uniform_real_distribution<float> posDist(-10.0f, 10.0f);
 
 	// ワールドトランスフォームの初期化
-	for (size_t i = 0; i < _countof(worldTransform_); i++) {
-		for (size_t j = 0; j < _countof(worldTransform_); j++) {
-			for (size_t k = 0; k < _countof(worldTransform_); k++) {
-				worldTransform_[i][j][k].translation_ = {
-				  -12 + (float)i * 3, -12 + (float)j * 3, (float)k * 3};
-				worldTransform_[i][j][k].Initialize();
-			}
-		}
-	}
+	worldTransform_.Initialize();
 
 	// ビュープロジェクションの初期化
-	viewProjection_.Initialize();
+	for (size_t i = 0; i < _countof(viewProjection_); i++) {
+		viewProjection_[i].eye = {posDist(engine), posDist(engine), posDist(engine)};
+		viewProjection_[i].Initialize();
+	}
 }
 
 void GameScene::Update() {
 
-	// 行列の再計算
-	viewProjection_.UpdateMatrix();
+	// SPACEを押すとカメラを切り替え
+	if (input_->TriggerKey(DIK_SPACE)) {
+		cameraNum++;
+		if (cameraNum > 2) {
+			cameraNum = 0;
+		}
+	}
 
+	// 三つあるカメラのデバック情報を表示
+	for (size_t i = 0; i < 3; i++) {
+		debugText_->SetPos(50, 50 + i * 100);
+		debugText_->Printf("Camera%d", i + 1);
+		debugText_->SetPos(50, 70 + i * 100);
+		debugText_->Printf(
+		  "eye:(%f, %f, %f)", viewProjection_[i].eye.x, viewProjection_[i].eye.y,
+		  viewProjection_[i].eye.z);
+		debugText_->SetPos(50, 90 + i * 100);
+		debugText_->Printf(
+		  "target:(%f, %f, %f)", viewProjection_[i].target.x, viewProjection_[i].target.y,
+		  viewProjection_[i].target.z);
+		debugText_->SetPos(50, 110 + i * 100);
+		debugText_->Printf(
+		  "up:(%f, %f, %f)", viewProjection_[i].up.x, viewProjection_[i].up.y,
+		  viewProjection_[i].up.z);
+	}
+
+	// 行列の再計算
+	for (size_t i = 0; i < _countof(viewProjection_); i++) {
+		viewProjection_[i].UpdateMatrix();
+	}
 }
 
 void GameScene::Draw() {
@@ -89,13 +111,7 @@ void GameScene::Draw() {
 
 	// 3Dモデル描写
 
-	for (size_t i = 0; i < _countof(worldTransform_); i++) {
-		for (size_t j = 0; j < _countof(worldTransform_); j++) {
-			for (size_t k = 0; k < _countof(worldTransform_); k++) {
-				model_->Draw(worldTransform_[i][j][k], viewProjection_, textureHandle_);
-			}
-		}
-	}
+	model_->Draw(worldTransform_, viewProjection_[cameraNum], textureHandle_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

@@ -61,9 +61,12 @@ class GameScene {
 	// 3Dモデル
 	Model* model_ = nullptr;
 
+	// 現在のカメラ
+	int cameraNum = 0;
+
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_[9][9][9];
+	WorldTransform worldTransform_;
 
 	// ビープロジェクション
-	ViewProjection viewProjection_;
+	ViewProjection viewProjection_[3];
 };
