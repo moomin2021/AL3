@@ -40,8 +40,11 @@ void GameScene::Initialize() {
 	// ワールドトランスフォームの初期化
 	for (size_t i = 0; i < _countof(worldTransform_); i++) {
 		for (size_t j = 0; j < _countof(worldTransform_); j++) {
-			worldTransform_[i][j].translation_ = {-16 + (float)i * 4, -16 + (float)j * 4, 0};
-			worldTransform_[i][j].Initialize();
+			for (size_t k = 0; k < _countof(worldTransform_); k++) {
+				worldTransform_[i][j][k].translation_ = {
+				  -12 + (float)i * 3, -12 + (float)j * 3, (float)k * 3};
+				worldTransform_[i][j][k].Initialize();
+			}
 		}
 	}
 
@@ -88,8 +91,9 @@ void GameScene::Draw() {
 
 	for (size_t i = 0; i < _countof(worldTransform_); i++) {
 		for (size_t j = 0; j < _countof(worldTransform_); j++) {
-			if (i % 2 == 0 || j % 2 == 0)
-				model_->Draw(worldTransform_[i][j], viewProjection_, textureHandle_);
+			for (size_t k = 0; k < _countof(worldTransform_); k++) {
+				model_->Draw(worldTransform_[i][j][k], viewProjection_, textureHandle_);
+			}
 		}
 	}
 
