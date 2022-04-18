@@ -51,22 +51,6 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	
-	// パーツID
-
-	public:
-		enum PartId
-		{
-			Root,// --> 大元
-			Spine,// -> 脊椎
-			Chest,// -> 胸
-			Head,// --> 頭
-			ArmL,// --> 左腕
-			ArmR,// --> 右腕
-			Hip,// ---> 尻
-			LegL,// --> 左足
-			LegR// ---> 右足
-	};
 
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
@@ -78,7 +62,8 @@ class GameScene {
 	Model* model_ = nullptr;
 
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_[100];
+	WorldTransform ceiling_[9];
+	WorldTransform floor_[9];
 
 	// ビープロジェクション
 	ViewProjection viewProjection_;
