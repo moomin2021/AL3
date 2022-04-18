@@ -37,18 +37,12 @@ void GameScene::Initialize() {
 	// 乱数範囲（座標用）
 	std::uniform_real_distribution<float> posDist(-10.0f, 10.0f);
 
-	// 天井の初期化
-	for (size_t i = 0; i < _countof(ceiling_); i++) {
-		ceiling_[i].translation_ = {-40.0f + (float)i * 10, 20, 0};
-		ceiling_[i].scale_ = {5.0f, 5.0f, 5.0f};
-		ceiling_[i].Initialize();
-	}
-
-	// 床の初期化
-	for (size_t i = 0; i < _countof(floor_); i++) {
-		floor_[i].translation_ = {-40.0f + (float)i * 10, -20, 0};
-		floor_[i].scale_ = {5.0f, 5.0f, 5.0f};
-		floor_[i].Initialize();
+	// ワールドトランスフォームの初期化
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		for (size_t j = 0; j < _countof(worldTransform_); j++) {
+			worldTransform_[i][j].translation_ = {-16 + (float)i * 4, -16 + (float)j * 4, 0};
+			worldTransform_[i][j].Initialize();
+		}
 	}
 
 	// ビュープロジェクションの初期化
@@ -92,14 +86,11 @@ void GameScene::Draw() {
 
 	// 3Dモデル描写
 
-	// 天井
-	for (size_t i = 0; i < _countof(ceiling_); i++) {
-		model_->Draw(ceiling_[i], viewProjection_, textureHandle_);
-	}
-
-	// 床
-	for (size_t i = 0; i < _countof(floor_); i++) {
-		model_->Draw(floor_[i], viewProjection_, textureHandle_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		for (size_t j = 0; j < _countof(worldTransform_); j++) {
+			if (i % 2 == 0 || j % 2 == 0)
+				model_->Draw(worldTransform_[i][j], viewProjection_, textureHandle_);
+		}
 	}
 
 	// 3Dオブジェクト描画後処理
