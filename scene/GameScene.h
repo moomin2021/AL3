@@ -64,9 +64,12 @@ class GameScene {
 	// 現在のカメラ
 	int cameraNum = 0;
 
+	// 各オブジェクトの中心座標からみた角度[
+	float angle[10];
+
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[10];
 
 	// ビープロジェクション
-	ViewProjection viewProjection_[3];
+	ViewProjection viewProjection_;
 };

@@ -38,47 +38,47 @@ void GameScene::Initialize() {
 	std::uniform_real_distribution<float> posDist(-10.0f, 10.0f);
 
 	// ワールドトランスフォームの初期化
-	worldTransform_.Initialize();
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		angle[i] = (360.0f / 10) * i;
+		worldTransform_[i].Initialize();
+	}
 
 	// ビュープロジェクションの初期化
-	for (size_t i = 0; i < _countof(viewProjection_); i++) {
-		viewProjection_[i].eye = {posDist(engine), posDist(engine), posDist(engine)};
-		viewProjection_[i].Initialize();
-	}
+	viewProjection_.Initialize();
 }
 
 void GameScene::Update() {
 
-	// SPACEを押すとカメラを切り替え
-	if (input_->TriggerKey(DIK_SPACE)) {
-		cameraNum++;
-		if (cameraNum > 2) {
-			cameraNum = 0;
-		}
+	for (size_t i = 0; i < _countof(angle); i++) {
+		angle[i] += 2.0f;
+		if (angle[i] >= 360.0f) angle[i] = 0.0f;
+
+		worldTransform_[i].translation_.x = cos(angle[i] * 3.14f / 180.0f) * 10.0f;
+		worldTransform_[i].translation_.y = sin(angle[i] * 3.14f / 180.0f) * 10.0f;
 	}
 
-	// 三つあるカメラのデバック情報を表示
-	for (size_t i = 0; i < 3; i++) {
-		debugText_->SetPos(50, 50 + i * 100);
-		debugText_->Printf("Camera%d", i + 1);
-		debugText_->SetPos(50, 70 + i * 100);
-		debugText_->Printf(
-		  "eye:(%f, %f, %f)", viewProjection_[i].eye.x, viewProjection_[i].eye.y,
-		  viewProjection_[i].eye.z);
-		debugText_->SetPos(50, 90 + i * 100);
-		debugText_->Printf(
-		  "target:(%f, %f, %f)", viewProjection_[i].target.x, viewProjection_[i].target.y,
-		  viewProjection_[i].target.z);
-		debugText_->SetPos(50, 110 + i * 100);
-		debugText_->Printf(
-		  "up:(%f, %f, %f)", viewProjection_[i].up.x, viewProjection_[i].up.y,
-		  viewProjection_[i].up.z);
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		worldTransform_[i].UpdateMatrix();
+	}
+
+	if (input_->PushKey(DIK_W)) {
+		viewProjection_.eye.z += 0.2f;
+	}
+
+	if (input_->PushKey(DIK_S)) {
+		viewProjection_.eye.z -= 0.2f;
 	}
 
 	// 行列の再計算
-	for (size_t i = 0; i < _countof(viewProjection_); i++) {
-		viewProjection_[i].UpdateMatrix();
-	}
+	viewProjection_.UpdateMatrix();
+
+	
+
+	// テキスト表示
+	debugText_->SetPos(50, 50);
+	debugText_->Printf(
+	  "translation:(%f, %f, %f)", worldTransform_[0].translation_.x,
+	  worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);
 }
 
 void GameScene::Draw() {
@@ -110,8 +110,9 @@ void GameScene::Draw() {
 	/// </summary>
 
 	// 3Dモデル描写
-
-	model_->Draw(worldTransform_, viewProjection_[cameraNum], textureHandle_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
