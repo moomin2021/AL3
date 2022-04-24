@@ -71,14 +71,6 @@ void GameScene::Update() {
 
 	// 行列の再計算
 	viewProjection_.UpdateMatrix();
-
-	
-
-	// テキスト表示
-	debugText_->SetPos(50, 50);
-	debugText_->Printf(
-	  "translation:(%f, %f, %f)", worldTransform_[0].translation_.x,
-	  worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);
 }
 
 void GameScene::Draw() {
