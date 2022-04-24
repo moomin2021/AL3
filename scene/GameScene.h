@@ -65,8 +65,8 @@ class GameScene {
 	int cameraNum = 0;
 
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[4];
 
 	// ビープロジェクション
-	ViewProjection viewProjection_[3];
+	ViewProjection viewProjection_;
 };
