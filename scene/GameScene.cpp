@@ -70,13 +70,44 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	// キャラクターの移動ベクトル
+	
+	// 前方ベクトル
+	XMFLOAT3 forwardVec = {0, 0, 1};
+
+	// 計算結果
+	XMFLOAT3 resultVec = {0, 0, 0};
+
+	// 移動ベクトル
 	XMFLOAT3 move = {0, 0, 0};
 
-	move = worldTransform_[0].rotation_;
+	resultVec.x = cosf(worldTransform_[0].rotation_.y) * forwardVec.x +
+	              sinf(worldTransform_[0].rotation_.y) * forwardVec.z;
+	resultVec.z = -sinf(worldTransform_[0].rotation_.y) * forwardVec.x +
+	              cosf(worldTransform_[0].rotation_.y) * forwardVec.z;
 
-	// キャラクターの移動速さ
-	const float characterSpeed = 0.2f;
+	// Dキー入力で右回転
+	if (input_->PushKey(DIK_RIGHT)) {
+		worldTransform_[0].rotation_.y += 0.1f;
+	}
+	
+	// Aキー入力で左回転
+	if (input_->PushKey(DIK_LEFT)) {
+		worldTransform_[0].rotation_.y -= 0.1f;
+	}
+
+	// Wキー入力で前方に移動
+	if (input_->PushKey(DIK_UP)) {
+		move = {resultVec.x, 0, resultVec.z};
+	}
+
+	// Sキー入力で前方に移動
+	if (input_->PushKey(DIK_DOWN)) {
+		move = {-resultVec.x, 0, -resultVec.z};
+	}
+
+	worldTransform_[0].translation_.x += move.x * 0.2f;
+	worldTransform_[0].translation_.y += move.y * 0.2f;
+	worldTransform_[0].translation_.z += move.z * 0.2f;
 
 	for (size_t i = 0; i < _countof(worldTransform_); i++) {
 		worldTransform_[i].UpdateMatrix();
