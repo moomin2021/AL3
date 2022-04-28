@@ -85,22 +85,22 @@ void GameScene::Update() {
 	resultVec.z = -sinf(worldTransform_[0].rotation_.y) * forwardVec.x +
 	              cosf(worldTransform_[0].rotation_.y) * forwardVec.z;
 
-	// Dキー入力で右回転
+	// 右キー入力で右回転
 	if (input_->PushKey(DIK_RIGHT)) {
 		worldTransform_[0].rotation_.y += 0.1f;
 	}
 	
-	// Aキー入力で左回転
+	// 左キー入力で左回転
 	if (input_->PushKey(DIK_LEFT)) {
 		worldTransform_[0].rotation_.y -= 0.1f;
 	}
 
-	// Wキー入力で前方に移動
+	// 上キー入力で前方に移動
 	if (input_->PushKey(DIK_UP)) {
 		move = {resultVec.x, 0, resultVec.z};
 	}
 
-	// Sキー入力で前方に移動
+	// 下キー入力で前方に移動
 	if (input_->PushKey(DIK_DOWN)) {
 		move = {-resultVec.x, 0, -resultVec.z};
 	}
