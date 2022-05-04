@@ -54,12 +54,15 @@ class GameScene {
 
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+
+	// オブジェクトの中心からみたカメラ角度
+	float angle = 0.0f;
 	
 	// 3Dモデル
 	Model* model_ = nullptr;
 
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_[4];
+	WorldTransform worldTransform_;
 
 	// ビープロジェクション
 	ViewProjection viewProjection_;
