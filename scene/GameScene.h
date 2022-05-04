@@ -52,17 +52,17 @@ class GameScene {
 	/// ゲームシーン用
 	/// </summary>
 
+	// カメラが注視するオブジェクトの番号
+	int targetNum = 0;
+
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
-
-	// オブジェクトの中心からみたカメラ角度
-	float angle = 0.0f;
 	
 	// 3Dモデル
 	Model* model_ = nullptr;
 
 	// ワールドトランスフォーム
-	WorldTransform worldTransform_;
+	WorldTransform worldTransform_[3];
 
 	// ビープロジェクション
 	ViewProjection viewProjection_;

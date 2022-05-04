@@ -37,11 +37,21 @@ void GameScene::Initialize() {
 	// 乱数範囲（座標用）
 	std::uniform_real_distribution<float> posDist(-10.0f, 10.0f);
 
+	// 各オブジェクトの位置を設定
+	worldTransform_[0].translation_ = {0.0f, +5.0f, 0.0f};
+	worldTransform_[1].translation_ = {-5.0f, -5.0f, 0.0f};
+	worldTransform_[2].translation_ = {+5.0f, -5.0f, 0.0f};
+
 	// ワールドトランスフォームの初期化
-	worldTransform_.Initialize();
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		worldTransform_[i].Initialize();
+	}
 
 	// カメラ視点座標を設定
-	viewProjection_.eye = {0, 0, -10};
+	viewProjection_.eye = {0, 0, -25};
+
+	// カメラの注視点を設定
+	viewProjection_.target = worldTransform_[0].translation_;
 
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
@@ -49,15 +59,18 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	// 角度に0.1fを足す
-	angle += 1.0f;
+	// SPACEキーを押したら注視対象を変更
+	if (input_->TriggerKey(DIK_SPACE)) {
 
-	// 角度が360度以上になったら角度を0度に戻す
-	if (angle >= 360.0f) angle = 0.0f;
+		// 注視対象番号に１を足す
+		targetNum++;
 
-	// カメラ位置を計算
-	viewProjection_.eye.x = cos(angle * 3.14f / 180.0f) * 10.0f;
-	viewProjection_.eye.z = sin(angle * 3.14f / 180.0f) * 10.0f;
+		// 注視対象番号がオブジェクトの数と同じになったら注視対象番号を初期化
+		if (_countof(worldTransform_) <= targetNum) targetNum = 0;
+
+		// カメラの注視点を更新
+		viewProjection_.target = worldTransform_[targetNum].translation_;
+	}
 
 	// 行列の再計算
 	viewProjection_.UpdateMatrix();
@@ -102,7 +115,9 @@ void GameScene::Draw() {
 	/// </summary>
 
 	// 3Dモデル描写
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
