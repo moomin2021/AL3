@@ -1,4 +1,5 @@
 ﻿#include "GameScene.h"
+#include "Easing.h"
 #include "TextureManager.h"
 #include <cassert>
 #include <random>
@@ -51,7 +52,7 @@ void GameScene::Initialize() {
 	viewProjection_.eye = {0, 0, -25};
 
 	// カメラの注視点を設定
-	viewProjection_.target = worldTransform_[0].translation_;
+	//viewProjection_.target = worldTransform_[0].translation_;
 
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
@@ -66,10 +67,29 @@ void GameScene::Update() {
 		targetNum++;
 
 		// 注視対象番号がオブジェクトの数と同じになったら注視対象番号を初期化
-		if (_countof(worldTransform_) <= targetNum) targetNum = 0;
+		if (_countof(worldTransform_) + 1 <= targetNum) targetNum = 1;
 
-		// カメラの注視点を更新
-		viewProjection_.target = worldTransform_[targetNum].translation_;
+
+		// カメラの移動量を計算
+		moveAmount.x = worldTransform_[targetNum - 1].translation_.x - viewProjection_.target.x;
+		moveAmount.y = worldTransform_[targetNum - 1].translation_.y - viewProjection_.target.y;
+		moveAmount.z = worldTransform_[targetNum - 1].translation_.z - viewProjection_.target.z;
+
+		// カメラの移動時間をリセット
+		cameraMoveTimer = 0;
+
+		// 移動前の位置を保存
+		savePos = viewProjection_.target;
+	}
+
+	if (cameraMoveTimer < cameraMoveTime) {
+
+		// カメラ移動時間インクリメント
+		cameraMoveTimer++;
+
+		viewProjection_.target.x = savePos.x + (moveAmount.x * Easing::easeOutCubic(cameraMoveTimer / cameraMoveTime));
+		viewProjection_.target.y = savePos.y + (moveAmount.y * Easing::easeOutCubic(cameraMoveTimer / cameraMoveTime));
+		viewProjection_.target.z = savePos.z + (moveAmount.z * Easing::easeOutCubic(cameraMoveTimer / cameraMoveTime));
 	}
 
 	// 行列の再計算
@@ -84,6 +104,18 @@ void GameScene::Update() {
 
 	debugText_->SetPos(50, 90);
 	debugText_->Printf("up:(%f, %f, %f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
+
+	debugText_->SetPos(50, 110);
+	debugText_->Printf("num:%d", targetNum);
+
+	debugText_->SetPos(50, 130);
+	debugText_->Printf("timer:%d", cameraMoveTimer);
+
+	debugText_->SetPos(50, 150);
+	debugText_->Printf("moveAmount:(%f, %f, %f)", moveAmount.x, moveAmount.y, moveAmount.z);
+
+	debugText_->SetPos(50, 170);
+	debugText_->Printf("result:%f", Easing::easeOutCubic(cameraMoveTimer / cameraMoveTime));
 }
 
 void GameScene::Draw() {

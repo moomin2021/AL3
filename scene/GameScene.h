@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "Audio.h"
-#include "DirectXCommon.h"
 #include "DebugText.h"
+#include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
 #include "SafeDelete.h"
@@ -55,9 +55,19 @@ class GameScene {
 	// カメラが注視するオブジェクトの番号
 	int targetNum = 0;
 
+	// カメラ移動の時間
+	float cameraMoveTime = 100;
+	float cameraMoveTimer = 100;
+
+	// カメラの移動量
+	DirectX::XMFLOAT3 moveAmount = {0, 0, 0};
+
+	// 移動する前の位置
+	DirectX::XMFLOAT3 savePos = {0, 0, 0};
+
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
-	
+
 	// 3Dモデル
 	Model* model_ = nullptr;
 
