@@ -62,6 +62,10 @@ void GameScene::Initialize() {
 	worldTransform_[3].parent_ = &worldTransform_[0];
 	worldTransform_[3].Initialize();
 
+	// マップ内に置くオブジェクトの設定
+	worldTransform_[4].translation_ = {4.0f, 0.0f, 0.0f};
+	worldTransform_[5].translation_ = {-4.0f, 0.0f, 0.0f};
+
 	// カメラ視点座標を設定
 	viewProjection_.eye = {0, 10, -15};
 
@@ -74,26 +78,28 @@ void GameScene::Update() {
 	// 前方ベクトル
 	XMFLOAT3 forwardVec = {0, 0, 1};
 
+	XMFLOAT3 backwardVec = {0, 0, -1};
+
 	// 計算結果
 	XMFLOAT3 resultVec = {0, 0, 0};
 
 	// 移動ベクトル
 	XMFLOAT3 move = {0, 0, 0};
 
-	resultVec.x = cosf(worldTransform_[0].rotation_.y) * forwardVec.x +
-	              sinf(worldTransform_[0].rotation_.y) * forwardVec.z;
-	resultVec.z = -sinf(worldTransform_[0].rotation_.y) * forwardVec.x +
-	              cosf(worldTransform_[0].rotation_.y) * forwardVec.z;
-
 	// 右キー入力で右回転
 	if (input_->PushKey(DIK_RIGHT)) {
 		worldTransform_[0].rotation_.y += 0.1f;
 	}
-	
+
 	// 左キー入力で左回転
 	if (input_->PushKey(DIK_LEFT)) {
 		worldTransform_[0].rotation_.y -= 0.1f;
 	}
+
+	resultVec.x = cosf(worldTransform_[0].rotation_.y) * forwardVec.x +
+	              sinf(worldTransform_[0].rotation_.y) * forwardVec.z;
+	resultVec.z = -sinf(worldTransform_[0].rotation_.y) * forwardVec.x +
+	              cosf(worldTransform_[0].rotation_.y) * forwardVec.z;
 
 	// 上キー入力で前方に移動
 	if (input_->PushKey(DIK_UP)) {
@@ -112,6 +118,14 @@ void GameScene::Update() {
 	for (size_t i = 0; i < _countof(worldTransform_); i++) {
 		worldTransform_[i].UpdateMatrix();
 	}
+
+	viewProjection_.eye.x = worldTransform_[0].translation_.x - resultVec.x * 10.0f;
+	viewProjection_.eye.y = 10.0f;
+	viewProjection_.eye.z = worldTransform_[0].translation_.z - resultVec.z * 10.0f;
+
+	viewProjection_.target = worldTransform_[0].translation_;
+
+	viewProjection_.UpdateMatrix();
 }
 
 void GameScene::Draw() {
